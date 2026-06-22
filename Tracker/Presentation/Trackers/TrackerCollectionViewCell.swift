@@ -11,6 +11,7 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
     weak var delegate: TrackerCollectionViewCellDelegate?
 
     private var trackerID: UUID?
+    private var trackerColor: UIColor?
 
     private let cardView: UIView = {
         let view = UIView()
@@ -73,15 +74,23 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
     override func prepareForReuse() {
         super.prepareForReuse()
         trackerID = nil
+        trackerColor = nil
         delegate = nil
     }
 
     func configure(with tracker: Tracker, completedDays: Int, isCompleted: Bool) {
         trackerID = tracker.id
+        trackerColor = tracker.color
         cardView.backgroundColor = tracker.color
         emojiLabel.text = tracker.emoji
         nameLabel.text = tracker.name
-        daysLabel.text = daysText(for: completedDays)
+        updateCompletionState(isCompleted: isCompleted, completedDays: completedDays)
+    }
+
+    func updateCompletionState(isCompleted: Bool, completedDays: Int) {
+        guard let trackerColor else { return }
+
+        daysLabel.text = completedDays.daysText
 
         let imageName = isCompleted ? "checkmark" : "plus"
         let image = UIImage(systemName: imageName)?.withConfiguration(
@@ -89,8 +98,8 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
         )
         completeButton.setImage(image, for: .normal)
         completeButton.backgroundColor = isCompleted
-            ? tracker.color.withAlphaComponent(0.3)
-            : tracker.color
+            ? trackerColor.withAlphaComponent(0.3)
+            : trackerColor
     }
 
     private func configureLayout() {
@@ -127,24 +136,6 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
             completeButton.widthAnchor.constraint(equalToConstant: 34),
             completeButton.heightAnchor.constraint(equalToConstant: 34)
         ])
-    }
-
-    private func daysText(for count: Int) -> String {
-        let lastTwoDigits = count % 100
-        let lastDigit = count % 10
-        let word: String
-
-        if (11...14).contains(lastTwoDigits) {
-            word = "дней"
-        } else if lastDigit == 1 {
-            word = "день"
-        } else if (2...4).contains(lastDigit) {
-            word = "дня"
-        } else {
-            word = "дней"
-        }
-
-        return "\(count) \(word)"
     }
 
     @objc private func completeButtonTapped() {

@@ -6,9 +6,14 @@ protocol NewHabitViewControllerDelegate: AnyObject {
 
 final class NewHabitViewController: UIViewController {
 
+    private enum Constants {
+        static let maxNameLength = 38
+        static let nameLimitMessage = "Ограничение 38 символов"
+    }
+
     weak var delegate: NewHabitViewControllerDelegate?
 
-    private var selectedSchedule: [Weekday] = []
+    private var selectedSchedule: Set<Weekday> = []
 
     private let nameTextField: UITextField = {
         let textField = UITextField()
@@ -22,6 +27,17 @@ final class NewHabitViewController: UIViewController {
         textField.leftViewMode = .always
         textField.translatesAutoresizingMaskIntoConstraints = false
         return textField
+    }()
+
+    private let nameLimitLabel: UILabel = {
+        let label = UILabel()
+        label.text = Constants.nameLimitMessage
+        label.font = .systemFont(ofSize: 17)
+        label.textColor = .systemRed
+        label.textAlignment = .center
+        label.isHidden = true
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
     }()
 
     private let optionsContainer: UIView = {
@@ -41,6 +57,16 @@ final class NewHabitViewController: UIViewController {
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
+
+    private lazy var optionsTopConstraint = optionsContainer.topAnchor.constraint(
+        equalTo: nameTextField.bottomAnchor,
+        constant: 24
+    )
+
+    private lazy var optionsTopWithErrorConstraint = optionsContainer.topAnchor.constraint(
+        equalTo: nameLimitLabel.bottomAnchor,
+        constant: 32
+    )
 
     private lazy var cancelButton: UIButton = {
         let button = UIButton(type: .system)
@@ -79,6 +105,7 @@ final class NewHabitViewController: UIViewController {
     }
 
     private func configureActions() {
+        nameTextField.delegate = self
         nameTextField.addTarget(self, action: #selector(nameTextChanged), for: .editingChanged)
         nameTextField.addTarget(self, action: #selector(nameEditingDidEndOnExit), for: .editingDidEndOnExit)
         categoryButton.addTarget(self, action: #selector(categoryButtonTapped), for: .touchUpInside)
@@ -90,6 +117,7 @@ final class NewHabitViewController: UIViewController {
         scheduleButton.translatesAutoresizingMaskIntoConstraints = false
 
         view.addSubview(nameTextField)
+        view.addSubview(nameLimitLabel)
         view.addSubview(optionsContainer)
         optionsContainer.addSubview(categoryButton)
         optionsContainer.addSubview(separatorView)
@@ -103,7 +131,12 @@ final class NewHabitViewController: UIViewController {
             nameTextField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
             nameTextField.heightAnchor.constraint(equalToConstant: 75),
 
-            optionsContainer.topAnchor.constraint(equalTo: nameTextField.bottomAnchor, constant: 24),
+            nameLimitLabel.topAnchor.constraint(equalTo: nameTextField.bottomAnchor, constant: 8),
+            nameLimitLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            nameLimitLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            nameLimitLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+
+            optionsTopConstraint,
             optionsContainer.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             optionsContainer.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
             optionsContainer.heightAnchor.constraint(equalToConstant: 150),
@@ -140,6 +173,24 @@ final class NewHabitViewController: UIViewController {
         let canCreate = !name.isEmpty && !selectedSchedule.isEmpty
         createButton.isEnabled = canCreate
         createButton.backgroundColor = canCreate ? .label : .systemGray2
+    }
+
+    private func setNameLimitErrorVisible(_ isVisible: Bool) {
+        guard nameLimitLabel.isHidden == isVisible else { return }
+
+        if isVisible {
+            optionsTopConstraint.isActive = false
+            nameLimitLabel.isHidden = false
+            optionsTopWithErrorConstraint.isActive = true
+        } else {
+            optionsTopWithErrorConstraint.isActive = false
+            nameLimitLabel.isHidden = true
+            optionsTopConstraint.isActive = true
+        }
+
+        UIView.animate(withDuration: 0.2) {
+            self.view.layoutIfNeeded()
+        }
     }
 
     private func scheduleText() -> String? {
@@ -191,16 +242,36 @@ final class NewHabitViewController: UIViewController {
             name: name,
             color: UIColor(red: 0.20, green: 0.78, blue: 0.35, alpha: 1),
             emoji: "🎨",
-            schedule: selectedSchedule
+            schedule: Weekday.allCases.filter { selectedSchedule.contains($0) }
         )
         delegate?.newHabitViewController(self, didCreate: tracker)
         dismiss(animated: true)
     }
 }
 
+extension NewHabitViewController: UITextFieldDelegate {
+
+    func textField(
+        _ textField: UITextField,
+        shouldChangeCharactersIn range: NSRange,
+        replacementString string: String
+    ) -> Bool {
+        guard textField === nameTextField,
+              let currentText = textField.text,
+              let textRange = Range(range, in: currentText) else {
+            return true
+        }
+
+        let updatedText = currentText.replacingCharacters(in: textRange, with: string)
+        let isWithinLimit = updatedText.count <= Constants.maxNameLength
+        setNameLimitErrorVisible(!isWithinLimit)
+        return isWithinLimit
+    }
+}
+
 extension NewHabitViewController: ScheduleViewControllerDelegate {
 
-    func scheduleViewController(_ viewController: ScheduleViewController, didSelect weekdays: [Weekday]) {
+    func scheduleViewController(_ viewController: ScheduleViewController, didSelect weekdays: Set<Weekday>) {
         selectedSchedule = weekdays
         scheduleButton.setDetail(scheduleText())
         updateCreateButton()

@@ -2,8 +2,12 @@ import UIKit
 
 final class TrackersViewController: UIViewController {
 
+    private enum Constants {
+        static let defaultCategoryTitle = "Новые трекеры"
+    }
+
     private var categories: [TrackerCategory] = [
-        TrackerCategory(title: "Новые трекеры", trackers: [])
+        TrackerCategory(title: Constants.defaultCategoryTitle, trackers: [])
     ]
     private var completedTrackers: [TrackerRecord] = []
     private var visibleCategories: [TrackerCategory] = []
@@ -180,14 +184,6 @@ final class TrackersViewController: UIViewController {
         completedTrackers.filter { $0.id == trackerID }.count
     }
 
-    private func indexPath(for trackerID: UUID) -> IndexPath? {
-        for (section, category) in visibleCategories.enumerated() {
-            if let item = category.trackers.firstIndex(where: { $0.id == trackerID }) {
-                return IndexPath(item: item, section: section)
-            }
-        }
-        return nil
-    }
 }
 
 extension TrackersViewController: UICollectionViewDataSource {
@@ -278,17 +274,17 @@ extension TrackersViewController: TrackerCollectionViewCellDelegate {
             completedTrackers.append(TrackerRecord(id: trackerID, date: selectedDate))
         }
 
-        guard let indexPath = indexPath(for: trackerID) else { return }
-        collectionView.reloadItems(at: [indexPath])
+        cell.updateCompletionState(
+            isCompleted: isTrackerCompleted(trackerID, on: currentDate),
+            completedDays: completedDaysCount(for: trackerID)
+        )
     }
 }
 
 extension TrackersViewController: NewHabitViewControllerDelegate {
 
     func newHabitViewController(_ viewController: NewHabitViewController, didCreate tracker: Tracker) {
-        let defaultCategoryTitle = "Новые трекеры"
-
-        if let categoryIndex = categories.firstIndex(where: { $0.title == defaultCategoryTitle }) {
+        if let categoryIndex = categories.firstIndex(where: { $0.title == Constants.defaultCategoryTitle }) {
             let category = categories[categoryIndex]
             let updatedCategory = TrackerCategory(
                 title: category.title,
@@ -298,7 +294,7 @@ extension TrackersViewController: NewHabitViewControllerDelegate {
                 index == categoryIndex ? updatedCategory : category
             }
         } else {
-            let newCategory = TrackerCategory(title: defaultCategoryTitle, trackers: [tracker])
+            let newCategory = TrackerCategory(title: Constants.defaultCategoryTitle, trackers: [tracker])
             categories = categories + [newCategory]
         }
 
