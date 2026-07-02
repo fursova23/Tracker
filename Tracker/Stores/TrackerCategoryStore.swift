@@ -1,31 +1,43 @@
 import CoreData
 
-final class TrackerCategoryStore {
+protocol TrackerCategoryStoreDelegate: AnyObject {
+    func trackerCategoryStore(_ store: TrackerCategoryStore, didUpdate categories: [TrackerCategory])
+}
+
+final class TrackerCategoryStore: NSObject {
+
+    weak var delegate: TrackerCategoryStoreDelegate?
 
     private let context: NSManagedObjectContext
     private let trackerStore: TrackerStore
-
-    init(coreDataStack: CoreDataStack, trackerStore: TrackerStore) {
-        context = coreDataStack.context
-        self.trackerStore = trackerStore
-    }
-
-    func fetchCategories() throws -> [TrackerCategory] {
+    private lazy var fetchedResultsController: NSFetchedResultsController<TrackerCategoryCoreData> = {
         let request = TrackerCategoryCoreData.fetchRequest()
         request.sortDescriptors = [
             NSSortDescriptor(key: "title", ascending: true)
         ]
 
-        let categoryObjects = try context.fetch(request)
+        let controller = NSFetchedResultsController(
+            fetchRequest: request,
+            managedObjectContext: context,
+            sectionNameKeyPath: nil,
+            cacheName: nil
+        )
+        controller.delegate = self
+        return controller
+    }()
 
-        return try categoryObjects.compactMap { categoryObject in
-            guard let title = categoryObject.title else { return nil }
+    init(coreDataStack: CoreDataStack, trackerStore: TrackerStore) {
+        context = coreDataStack.context
+        self.trackerStore = trackerStore
+        super.init()
 
-            return TrackerCategory(
-                title: title,
-                trackers: try trackerStore.fetchTrackers(inCategoryWithTitle: title)
-            )
-        }
+        self.trackerStore.delegate = self
+        try? fetchedResultsController.performFetch()
+    }
+
+    func fetchCategories() throws -> [TrackerCategory] {
+        try fetchedResultsController.performFetch()
+        return categories()
     }
 
     func add(_ tracker: Tracker, toCategoryWithTitle title: String) throws {
@@ -43,5 +55,36 @@ final class TrackerCategoryStore {
         categoryObject.title = title
 
         try context.save()
+    }
+
+    private func categories() -> [TrackerCategory] {
+        let categoryObjects = fetchedResultsController.fetchedObjects ?? []
+
+        return categoryObjects.compactMap { categoryObject in
+            guard let title = categoryObject.title else { return nil }
+
+            return TrackerCategory(
+                title: title,
+                trackers: trackerStore.trackers(inCategoryWithTitle: title)
+            )
+        }
+    }
+
+    private func notifyDelegate() {
+        delegate?.trackerCategoryStore(self, didUpdate: categories())
+    }
+}
+
+extension TrackerCategoryStore: NSFetchedResultsControllerDelegate {
+
+    func controllerDidChangeContent(_ controller: NSFetchedResultsController<any NSFetchRequestResult>) {
+        notifyDelegate()
+    }
+}
+
+extension TrackerCategoryStore: TrackerStoreDelegate {
+
+    func trackerStore(_ store: TrackerStore, didUpdate trackers: [Tracker]) {
+        notifyDelegate()
     }
 }

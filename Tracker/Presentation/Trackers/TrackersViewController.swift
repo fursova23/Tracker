@@ -67,6 +67,9 @@ final class TrackersViewController: UIViewController {
         self.trackerCategoryStore = trackerCategoryStore
         self.trackerRecordStore = trackerRecordStore
         super.init(nibName: nil, bundle: nil)
+
+        self.trackerCategoryStore.delegate = self
+        self.trackerRecordStore.delegate = self
     }
 
     required init?(coder: NSCoder) {
@@ -172,15 +175,6 @@ final class TrackersViewController: UIViewController {
         }
     }
 
-    private func reloadDataFromStore() {
-        do {
-            categories = try trackerCategoryStore.fetchCategories()
-            completedTrackers = try trackerRecordStore.fetchRecords()
-        } catch {
-            assertionFailure("Failed to reload trackers: \(error)")
-        }
-    }
-
     private func updateVisibleTrackers() {
         let searchText = searchTextField.text?
             .trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
@@ -216,6 +210,21 @@ final class TrackersViewController: UIViewController {
 
     private func completedDaysCount(for trackerID: UUID) -> Int {
         completedTrackers.filter { $0.id == trackerID }.count
+    }
+
+    private func updateVisibleCellsCompletionState() {
+        collectionView.visibleCells.forEach { visibleCell in
+            guard let indexPath = collectionView.indexPath(for: visibleCell),
+                  let cell = visibleCell as? TrackerCollectionViewCell else {
+                return
+            }
+
+            let tracker = visibleCategories[indexPath.section].trackers[indexPath.item]
+            cell.updateCompletionState(
+                isCompleted: isTrackerCompleted(tracker.id, on: currentDate),
+                completedDays: completedDaysCount(for: tracker.id)
+            )
+        }
     }
 
 }
@@ -300,30 +309,18 @@ extension TrackersViewController: TrackerCollectionViewCellDelegate {
         let today = calendar.startOfDay(for: Date())
         guard selectedDate <= today else { return }
 
-        if let recordIndex = completedTrackers.firstIndex(where: { record in
-            record.id == trackerID && calendar.isDate(record.date, inSameDayAs: selectedDate)
-        }) {
-            do {
-                try trackerRecordStore.deleteRecord(for: trackerID, on: selectedDate)
-                completedTrackers.remove(at: recordIndex)
-            } catch {
-                assertionFailure("Failed to delete tracker record: \(error)")
-                return
-            }
-        } else {
-            do {
-                try trackerRecordStore.addRecord(for: trackerID, on: selectedDate)
-                completedTrackers.append(TrackerRecord(id: trackerID, date: selectedDate))
-            } catch {
-                assertionFailure("Failed to add tracker record: \(error)")
-                return
-            }
-        }
+        let wasCompleted = isTrackerCompleted(trackerID, on: selectedDate)
 
-        cell.updateCompletionState(
-            isCompleted: isTrackerCompleted(trackerID, on: currentDate),
-            completedDays: completedDaysCount(for: trackerID)
-        )
+        do {
+            if wasCompleted {
+                try trackerRecordStore.deleteRecord(for: trackerID, on: selectedDate)
+            } else {
+                try trackerRecordStore.addRecord(for: trackerID, on: selectedDate)
+            }
+        } catch {
+            assertionFailure("Failed to update tracker record: \(error)")
+            return
+        }
     }
 }
 
@@ -332,12 +329,24 @@ extension TrackersViewController: NewHabitViewControllerDelegate {
     func newHabitViewController(_ viewController: NewHabitViewController, didCreate tracker: Tracker) {
         do {
             try trackerCategoryStore.add(tracker, toCategoryWithTitle: Constants.defaultCategoryTitle)
-            reloadDataFromStore()
         } catch {
             assertionFailure("Failed to save tracker: \(error)")
-            return
         }
+    }
+}
 
+extension TrackersViewController: TrackerCategoryStoreDelegate {
+
+    func trackerCategoryStore(_ store: TrackerCategoryStore, didUpdate categories: [TrackerCategory]) {
+        self.categories = categories
         updateVisibleTrackers()
+    }
+}
+
+extension TrackersViewController: TrackerRecordStoreDelegate {
+
+    func trackerRecordStore(_ store: TrackerRecordStore, didUpdate records: [TrackerRecord]) {
+        completedTrackers = records
+        updateVisibleCellsCompletionState()
     }
 }

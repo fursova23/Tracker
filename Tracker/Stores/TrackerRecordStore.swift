@@ -1,28 +1,40 @@
 import CoreData
 
-final class TrackerRecordStore {
+protocol TrackerRecordStoreDelegate: AnyObject {
+    func trackerRecordStore(_ store: TrackerRecordStore, didUpdate records: [TrackerRecord])
+}
+
+final class TrackerRecordStore: NSObject {
+
+    weak var delegate: TrackerRecordStoreDelegate?
 
     private let context: NSManagedObjectContext
-
-    init(coreDataStack: CoreDataStack) {
-        context = coreDataStack.context
-    }
-
-    func fetchRecords() throws -> [TrackerRecord] {
+    private lazy var fetchedResultsController: NSFetchedResultsController<TrackerRecordCoreData> = {
         let request = TrackerRecordCoreData.fetchRequest()
         request.sortDescriptors = [
             NSSortDescriptor(key: "date", ascending: true)
         ]
 
-        let recordObjects = try context.fetch(request)
-        return recordObjects.compactMap { recordObject in
-            guard let trackerID = recordObject.tracker?.id,
-                  let date = recordObject.date else {
-                return nil
-            }
+        let controller = NSFetchedResultsController(
+            fetchRequest: request,
+            managedObjectContext: context,
+            sectionNameKeyPath: nil,
+            cacheName: nil
+        )
+        controller.delegate = self
+        return controller
+    }()
 
-            return TrackerRecord(id: trackerID, date: date)
-        }
+    init(coreDataStack: CoreDataStack) {
+        context = coreDataStack.context
+        super.init()
+
+        try? fetchedResultsController.performFetch()
+    }
+
+    func fetchRecords() throws -> [TrackerRecord] {
+        try fetchedResultsController.performFetch()
+        return records()
     }
 
     func addRecord(for trackerID: UUID, on date: Date) throws {
@@ -71,5 +83,25 @@ final class TrackerRecordStore {
         request.fetchLimit = 1
 
         return try context.fetch(request).first
+    }
+
+    private func records() -> [TrackerRecord] {
+        let recordObjects = fetchedResultsController.fetchedObjects ?? []
+
+        return recordObjects.compactMap { recordObject in
+            guard let trackerID = recordObject.tracker?.id,
+                  let date = recordObject.date else {
+                return nil
+            }
+
+            return TrackerRecord(id: trackerID, date: date)
+        }
+    }
+}
+
+extension TrackerRecordStore: NSFetchedResultsControllerDelegate {
+
+    func controllerDidChangeContent(_ controller: NSFetchedResultsController<any NSFetchRequestResult>) {
+        delegate?.trackerRecordStore(self, didUpdate: records())
     }
 }

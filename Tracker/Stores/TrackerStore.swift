@@ -5,20 +5,48 @@ enum StoreError: Error {
     case trackerNotFound
 }
 
-final class TrackerStore {
+protocol TrackerStoreDelegate: AnyObject {
+    func trackerStore(_ store: TrackerStore, didUpdate trackers: [Tracker])
+}
+
+final class TrackerStore: NSObject {
+
+    weak var delegate: TrackerStoreDelegate?
 
     private let context: NSManagedObjectContext
+    private lazy var fetchedResultsController: NSFetchedResultsController<TrackerCoreData> = {
+        let request = TrackerCoreData.fetchRequest()
+        request.sortDescriptors = [
+            NSSortDescriptor(key: "name", ascending: true)
+        ]
+
+        let controller = NSFetchedResultsController(
+            fetchRequest: request,
+            managedObjectContext: context,
+            sectionNameKeyPath: nil,
+            cacheName: nil
+        )
+        controller.delegate = self
+        return controller
+    }()
 
     init(coreDataStack: CoreDataStack) {
         context = coreDataStack.context
+        super.init()
+
+        try? fetchedResultsController.performFetch()
     }
 
     func fetchTrackers(inCategoryWithTitle title: String) throws -> [Tracker] {
-        let request = TrackerCoreData.fetchRequest()
-        request.predicate = NSPredicate(format: "category.title == %@", title)
+        try fetchedResultsController.performFetch()
+        return trackers(inCategoryWithTitle: title)
+    }
 
-        let trackerObjects = try context.fetch(request)
-        return trackerObjects.compactMap { tracker(from: $0) }
+    func trackers(inCategoryWithTitle title: String) -> [Tracker] {
+        let trackerObjects = fetchedResultsController.fetchedObjects ?? []
+        return trackerObjects
+            .filter { $0.category?.title == title }
+            .compactMap { tracker(from: $0) }
     }
 
     func add(_ tracker: Tracker, toCategoryWithTitle title: String) throws {
@@ -111,5 +139,14 @@ final class TrackerStore {
         let blue = CGFloat(value & 0xFF) / 255
 
         return UIColor(red: red, green: green, blue: blue, alpha: 1)
+    }
+}
+
+extension TrackerStore: NSFetchedResultsControllerDelegate {
+
+    func controllerDidChangeContent(_ controller: NSFetchedResultsController<any NSFetchRequestResult>) {
+        let trackerObjects = fetchedResultsController.fetchedObjects ?? []
+        let trackers = trackerObjects.compactMap { tracker(from: $0) }
+        delegate?.trackerStore(self, didUpdate: trackers)
     }
 }
