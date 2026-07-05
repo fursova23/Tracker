@@ -31,7 +31,7 @@ final class CoreDataStack {
             try context.save()
         } catch {
             let error = error as NSError
-            fatalError("Unresolved Core Data error \(error), \(error.userInfo)")
+            print("Failed to save Core Data context: \(error), \(error.userInfo)")
         }
     }
 }
