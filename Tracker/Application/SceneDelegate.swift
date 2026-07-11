@@ -4,6 +4,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     var window: UIWindow?
 
+    private enum Constants {
+        static let hasSeenOnboardingKey = "hasSeenOnboarding"
+    }
+
     private lazy var coreDataStack: CoreDataStack = {
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
             fatalError("AppDelegate is unavailable")
@@ -15,7 +19,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = scene as? UIWindowScene else { return }
 
         let window = UIWindow(windowScene: windowScene)
-        window.rootViewController = MainTabBarController(coreDataStack: coreDataStack)
+        window.rootViewController = makeRootViewController()
         self.window = window
         window.makeKeyAndVisible()
     }
@@ -49,5 +53,24 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         coreDataStack.saveContext()
     }
 
+    private func makeRootViewController() -> UIViewController {
+        let hasSeenOnboarding = UserDefaults.standard.bool(forKey: Constants.hasSeenOnboardingKey)
+        guard !hasSeenOnboarding else {
+            return MainTabBarController(coreDataStack: coreDataStack)
+        }
+
+        let onboardingViewController = OnboardingViewController()
+        onboardingViewController.completion = { [weak self] in
+            self?.showMainScreen()
+        }
+        return onboardingViewController
+    }
+
+    private func showMainScreen() {
+        UserDefaults.standard.set(true, forKey: Constants.hasSeenOnboardingKey)
+
+        let mainTabBarController = MainTabBarController(coreDataStack: coreDataStack)
+        window?.rootViewController = mainTabBarController
+    }
 
 }
