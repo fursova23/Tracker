@@ -2,10 +2,6 @@ import UIKit
 
 final class TrackersViewController: UIViewController {
 
-    private enum Constants {
-        static let defaultCategoryTitle = "Новые трекеры"
-    }
-
     private let trackerCategoryStore: TrackerCategoryStore
     private let trackerRecordStore: TrackerRecordStore
 
@@ -147,7 +143,7 @@ final class TrackersViewController: UIViewController {
     }
 
     @objc private func addTrackerButtonTapped() {
-        let newHabitViewController = NewHabitViewController()
+        let newHabitViewController = NewHabitViewController(trackerCategoryStore: trackerCategoryStore)
         newHabitViewController.delegate = self
 
         let navigationController = UINavigationController(rootViewController: newHabitViewController)
@@ -167,7 +163,6 @@ final class TrackersViewController: UIViewController {
 
     private func loadData() {
         do {
-            try trackerCategoryStore.createCategoryIfNeeded(withTitle: Constants.defaultCategoryTitle)
             categories = try trackerCategoryStore.fetchCategories()
             completedTrackers = try trackerRecordStore.fetchRecords()
         } catch {
@@ -326,9 +321,13 @@ extension TrackersViewController: TrackerCollectionViewCellDelegate {
 
 extension TrackersViewController: NewHabitViewControllerDelegate {
 
-    func newHabitViewController(_ viewController: NewHabitViewController, didCreate tracker: Tracker) {
+    func newHabitViewController(
+        _ viewController: NewHabitViewController,
+        didCreate tracker: Tracker,
+        categoryTitle: String
+    ) {
         do {
-            try trackerCategoryStore.add(tracker, toCategoryWithTitle: Constants.defaultCategoryTitle)
+            try trackerCategoryStore.add(tracker, toCategoryWithTitle: categoryTitle)
         } catch {
             assertionFailure("Failed to save tracker: \(error)")
         }

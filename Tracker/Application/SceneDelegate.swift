@@ -4,9 +4,12 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     var window: UIWindow?
 
-    private lazy var coreDataStack: CoreDataStack = {
+    private let userDefaultsService = UserDefaultsService.shared
+    
+    private lazy var coreDataStack: CoreDataStack? = {
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
-            fatalError("AppDelegate is unavailable")
+            assertionFailure("AppDelegate is unavailable")
+            return nil
         }
         return appDelegate.coreDataStack
     }()
@@ -15,7 +18,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = scene as? UIWindowScene else { return }
 
         let window = UIWindow(windowScene: windowScene)
-        window.rootViewController = MainTabBarController(coreDataStack: coreDataStack)
+        window.rootViewController = makeRootViewController()
         self.window = window
         window.makeKeyAndVisible()
     }
@@ -46,8 +49,36 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // Called as the scene transitions from the foreground to the background.
         // Use this method to save data, release shared resources, and store enough scene-specific state information
         // to restore the scene back to its current state.
-        coreDataStack.saveContext()
+        coreDataStack?.saveContext()
     }
 
+    private func makeRootViewController() -> UIViewController {
+        guard let coreDataStack else {
+            assertionFailure("CoreDataStack is unavailable")
+            return UIViewController()
+        }
+
+        guard !userDefaultsService.hasSeenOnboarding else {
+            return MainTabBarController(coreDataStack: coreDataStack)
+        }
+
+        let onboardingViewController = OnboardingViewController()
+        onboardingViewController.completion = { [weak self] in
+            self?.showMainScreen()
+        }
+        return onboardingViewController
+    }
+
+    private func showMainScreen() {
+        guard let coreDataStack else {
+            assertionFailure("CoreDataStack is unavailable")
+            return
+        }
+
+        userDefaultsService.hasSeenOnboarding = true
+
+        let mainTabBarController = MainTabBarController(coreDataStack: coreDataStack)
+        window?.rootViewController = mainTabBarController
+    }
 
 }

@@ -1,7 +1,11 @@
 import UIKit
 
 protocol NewHabitViewControllerDelegate: AnyObject {
-    func newHabitViewController(_ viewController: NewHabitViewController, didCreate tracker: Tracker)
+    func newHabitViewController(
+        _ viewController: NewHabitViewController,
+        didCreate tracker: Tracker,
+        categoryTitle: String
+    )
 }
 
 final class NewHabitViewController: UIViewController {
@@ -38,7 +42,9 @@ final class NewHabitViewController: UIViewController {
 
     weak var delegate: NewHabitViewControllerDelegate?
 
+    private let trackerCategoryStore: TrackerCategoryStore
     private var selectedSchedule: Set<Weekday> = []
+    private var selectedCategoryTitle: String?
     private var selectedEmoji: String?
     private var selectedColor: UIColor?
 
@@ -188,6 +194,15 @@ final class NewHabitViewController: UIViewController {
         return button
     }()
 
+    init(trackerCategoryStore: TrackerCategoryStore) {
+        self.trackerCategoryStore = trackerCategoryStore
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
@@ -305,6 +320,7 @@ final class NewHabitViewController: UIViewController {
     private func updateCreateButton() {
         let name = nameTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
         let canCreate = !name.isEmpty
+            && selectedCategoryTitle != nil
             && !selectedSchedule.isEmpty
             && selectedEmoji != nil
             && selectedColor != nil
@@ -354,7 +370,21 @@ final class NewHabitViewController: UIViewController {
         nameTextField.resignFirstResponder()
     }
 
-    @objc private func categoryButtonTapped() {}
+    @objc private func categoryButtonTapped() {
+        view.endEditing(true)
+
+        let viewModel = CategoryViewModel(
+            categoryStore: trackerCategoryStore,
+            selectedCategoryTitle: selectedCategoryTitle
+        )
+        let categoryViewController = CategoryViewController(viewModel: viewModel)
+        categoryViewController.onCategorySelected = { [weak self] title in
+            self?.selectedCategoryTitle = title
+            self?.categoryButton.setDetail(title)
+            self?.updateCreateButton()
+        }
+        navigationController?.pushViewController(categoryViewController, animated: true)
+    }
 
     @objc private func scheduleButtonTapped() {
         view.endEditing(true)
@@ -370,6 +400,7 @@ final class NewHabitViewController: UIViewController {
     @objc private func createButtonTapped() {
         guard let name = nameTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines),
               !name.isEmpty,
+              let selectedCategoryTitle,
               !selectedSchedule.isEmpty,
               let selectedEmoji,
               let selectedColor else {
@@ -383,7 +414,7 @@ final class NewHabitViewController: UIViewController {
             emoji: selectedEmoji,
             schedule: Weekday.allCases.filter { selectedSchedule.contains($0) }
         )
-        delegate?.newHabitViewController(self, didCreate: tracker)
+        delegate?.newHabitViewController(self, didCreate: tracker, categoryTitle: selectedCategoryTitle)
         dismiss(animated: true)
     }
 }
