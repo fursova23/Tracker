@@ -165,7 +165,7 @@ final class CategoryViewController: UIViewController {
 extension CategoryViewController: UITableViewDataSource {
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        viewModel.numberOfCategories
+        viewModel.categoriesAmount
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -178,7 +178,7 @@ extension CategoryViewController: UITableViewDataSource {
 
         cell.configure(
             title: viewModel.categoryTitle(at: indexPath.row),
-            isSelected: viewModel.isSelectedCategory(at: indexPath.row)
+            isSelected: viewModel.isCategorySelected(at: indexPath.row)
         )
         return cell
     }

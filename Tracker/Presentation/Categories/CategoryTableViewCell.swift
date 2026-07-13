@@ -4,6 +4,10 @@ final class CategoryTableViewCell: UITableViewCell {
 
     static let reuseIdentifier = "CategoryTableViewCell"
 
+    private enum SystemImageName {
+        static let checkmark = "checkmark"
+    }
+
     // MARK: - UI Elements
 
     private let titleLabel: UILabel = {
@@ -15,7 +19,7 @@ final class CategoryTableViewCell: UITableViewCell {
     }()
 
     private let checkmarkImageView: UIImageView = {
-        let imageView = UIImageView(image: UIImage(systemName: "checkmark"))
+        let imageView = UIImageView(image: UIImage(systemName: SystemImageName.checkmark))
         imageView.tintColor = UIColor(resource: .ypBlueIOS)
         imageView.contentMode = .scaleAspectFit
         imageView.translatesAutoresizingMaskIntoConstraints = false
@@ -44,8 +48,9 @@ final class CategoryTableViewCell: UITableViewCell {
         ])
     }
 
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        return nil
     }
 
     // MARK: - Configuration

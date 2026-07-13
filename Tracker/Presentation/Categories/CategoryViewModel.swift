@@ -18,7 +18,7 @@ final class CategoryViewModel {
     }
     private var selectedCategoryTitle: String?
 
-    var numberOfCategories: Int {
+    var categoriesAmount: Int {
         categories.count
     }
 
@@ -59,7 +59,7 @@ final class CategoryViewModel {
         categories[row].title
     }
 
-    func isSelectedCategory(at row: Int) -> Bool {
+    func isCategorySelected(at row: Int) -> Bool {
         categoryTitle(at: row) == selectedCategoryTitle
     }
 

@@ -4,13 +4,12 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     var window: UIWindow?
 
-    private enum Constants {
-        static let hasSeenOnboardingKey = "hasSeenOnboarding"
-    }
-
-    private lazy var coreDataStack: CoreDataStack = {
+    private let userDefaultsService = UserDefaultsService.shared
+    
+    private lazy var coreDataStack: CoreDataStack? = {
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
-            fatalError("AppDelegate is unavailable")
+            assertionFailure("AppDelegate is unavailable")
+            return nil
         }
         return appDelegate.coreDataStack
     }()
@@ -50,12 +49,16 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // Called as the scene transitions from the foreground to the background.
         // Use this method to save data, release shared resources, and store enough scene-specific state information
         // to restore the scene back to its current state.
-        coreDataStack.saveContext()
+        coreDataStack?.saveContext()
     }
 
     private func makeRootViewController() -> UIViewController {
-        let hasSeenOnboarding = UserDefaults.standard.bool(forKey: Constants.hasSeenOnboardingKey)
-        guard !hasSeenOnboarding else {
+        guard let coreDataStack else {
+            assertionFailure("CoreDataStack is unavailable")
+            return UIViewController()
+        }
+
+        guard !userDefaultsService.hasSeenOnboarding else {
             return MainTabBarController(coreDataStack: coreDataStack)
         }
 
@@ -67,7 +70,12 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
 
     private func showMainScreen() {
-        UserDefaults.standard.set(true, forKey: Constants.hasSeenOnboardingKey)
+        guard let coreDataStack else {
+            assertionFailure("CoreDataStack is unavailable")
+            return
+        }
+
+        userDefaultsService.hasSeenOnboarding = true
 
         let mainTabBarController = MainTabBarController(coreDataStack: coreDataStack)
         window?.rootViewController = mainTabBarController
