@@ -6,7 +6,7 @@ final class StatisticsViewController: UIViewController {
         super.viewDidLoad()
 
         view.backgroundColor = .systemBackground
-        navigationItem.title = "Статистика"
+        navigationItem.title = L10n.Statistics.title
         navigationItem.largeTitleDisplayMode = .always
     }
 }

@@ -12,7 +12,7 @@ final class TrackersPlaceholderView: UIView {
 
     private let titleLabel: UILabel = {
         let label = UILabel()
-        label.text = "Что будем отслеживать?"
+        label.text = L10n.Trackers.emptyPlaceholder
         label.font = .systemFont(ofSize: 12, weight: .medium)
         label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false

@@ -12,7 +12,7 @@ final class TrackersViewController: UIViewController {
 
     private let searchTextField: UISearchTextField = {
         let textField = UISearchTextField()
-        textField.placeholder = "Поиск"
+        textField.placeholder = L10n.Trackers.searchPlaceholder
         textField.font = .systemFont(ofSize: 17)
         textField.backgroundColor = .secondarySystemBackground
         textField.layer.cornerRadius = 10
@@ -26,7 +26,6 @@ final class TrackersViewController: UIViewController {
         let datePicker = UIDatePicker()
         datePicker.datePickerMode = .date
         datePicker.preferredDatePickerStyle = .compact
-        datePicker.locale = Locale(identifier: "ru_RU")
         datePicker.tintColor = UIColor(resource: .ypBlueIOS)
         datePicker.translatesAutoresizingMaskIntoConstraints = false
         return datePicker
@@ -85,7 +84,7 @@ final class TrackersViewController: UIViewController {
     }
 
     private func configureNavigationBar() {
-        navigationItem.title = "Трекеры"
+        navigationItem.title = L10n.Trackers.title
         navigationItem.largeTitleDisplayMode = .always
 
         let addButton = UIBarButtonItem(
@@ -95,7 +94,7 @@ final class TrackersViewController: UIViewController {
             action: #selector(addTrackerButtonTapped)
         )
         addButton.tintColor = .label
-        addButton.accessibilityLabel = "Добавить трекер"
+        addButton.accessibilityLabel = L10n.Trackers.addAccessibility
         navigationItem.leftBarButtonItem = addButton
 
         NSLayoutConstraint.activate([
@@ -189,7 +188,11 @@ final class TrackersViewController: UIViewController {
         collectionView.reloadData()
         placeholderView.isHidden = !visibleCategories.isEmpty
         let containsTrackers = categories.contains { !$0.trackers.isEmpty }
-        placeholderView.setText(containsTrackers ? "Ничего не найдено" : "Что будем отслеживать?")
+        placeholderView.setText(
+            containsTrackers
+                ? L10n.Trackers.searchEmptyPlaceholder
+                : L10n.Trackers.emptyPlaceholder
+        )
     }
 
     private func weekday(for date: Date) -> Weekday {

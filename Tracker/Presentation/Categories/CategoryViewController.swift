@@ -33,7 +33,7 @@ final class CategoryViewController: UIViewController {
 
     private let placeholderLabel: UILabel = {
         let label = UILabel()
-        label.text = "Привычки и события можно\nобъединить по смыслу"
+        label.text = L10n.Category.emptyPlaceholder
         label.font = .systemFont(ofSize: 12, weight: .medium)
         label.textColor = .label
         label.textAlignment = .center
@@ -53,7 +53,7 @@ final class CategoryViewController: UIViewController {
 
     private lazy var addCategoryButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("Добавить категорию", for: .normal)
+        button.setTitle(L10n.Category.addButton, for: .normal)
         button.setTitleColor(.systemBackground, for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
         button.backgroundColor = .label
@@ -78,7 +78,7 @@ final class CategoryViewController: UIViewController {
         super.viewDidLoad()
 
         view.backgroundColor = .systemBackground
-        navigationItem.title = "Категория"
+        navigationItem.title = L10n.Category.title
         navigationItem.largeTitleDisplayMode = .never
 
         setupBindings()
@@ -145,7 +145,9 @@ final class CategoryViewController: UIViewController {
 
     private func showAlert(message: String) {
         let alertController = UIAlertController(title: nil, message: message, preferredStyle: .alert)
-        alertController.addAction(UIAlertAction(title: "ОК", style: .default))
+        alertController.addAction(
+            UIAlertAction(title: L10n.Category.Alert.ok, style: .default)
+        )
         present(alertController, animated: true)
     }
 

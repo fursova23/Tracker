@@ -53,13 +53,13 @@ final class MainTabBarController: UITabBarController {
                 trackerCategoryStore: trackerCategoryStore,
                 trackerRecordStore: trackerRecordStore
             ),
-            title: "Трекеры",
+            title: L10n.Tab.trackers,
             image: UIImage(resource: .trackersTabIcon),
             tag: 0
         )
         let statisticsController = makeNavigationController(
             rootViewController: StatisticsViewController(),
-            title: "Статистика",
+            title: L10n.Tab.statistics,
             image: UIImage(resource: .statisticsTabIcon),
             tag: 1
         )

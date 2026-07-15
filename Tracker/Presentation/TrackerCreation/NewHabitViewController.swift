@@ -12,7 +12,7 @@ final class NewHabitViewController: UIViewController {
 
     private enum Constants {
         static let maxNameLength = 38
-        static let nameLimitMessage = "Ограничение 38 символов"
+        static let nameLimitMessage = L10n.Tracker.Creation.nameLimit
         static let emojis = [
             "🙂", "😻", "🌺", "🐶", "❤️", "😱",
             "😇", "😡", "🥶", "🤔", "🙌", "🍔",
@@ -64,7 +64,7 @@ final class NewHabitViewController: UIViewController {
 
     private let nameTextField: UITextField = {
         let textField = UITextField()
-        textField.placeholder = "Введите название трекера"
+        textField.placeholder = L10n.Tracker.Creation.namePlaceholder
         textField.font = .systemFont(ofSize: 17)
         textField.backgroundColor = .secondarySystemBackground
         textField.layer.cornerRadius = 16
@@ -95,8 +95,12 @@ final class NewHabitViewController: UIViewController {
         return view
     }()
 
-    private let categoryButton = TrackerOptionButton(title: "Категория")
-    private let scheduleButton = TrackerOptionButton(title: "Расписание")
+    private let categoryButton = TrackerOptionButton(
+        title: L10n.Tracker.Creation.category
+    )
+    private let scheduleButton = TrackerOptionButton(
+        title: L10n.Tracker.Creation.schedule
+    )
 
     private let separatorView: UIView = {
         let view = UIView()
@@ -107,7 +111,7 @@ final class NewHabitViewController: UIViewController {
 
     private let emojiTitleLabel: UILabel = {
         let label = UILabel()
-        label.text = "Emoji"
+        label.text = L10n.Tracker.Creation.emoji
         label.font = .systemFont(ofSize: 19, weight: .bold)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -134,7 +138,7 @@ final class NewHabitViewController: UIViewController {
 
     private let colorTitleLabel: UILabel = {
         let label = UILabel()
-        label.text = "Цвет"
+        label.text = L10n.Tracker.Creation.color
         label.font = .systemFont(ofSize: 19, weight: .bold)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -171,7 +175,7 @@ final class NewHabitViewController: UIViewController {
 
     private lazy var cancelButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("Отменить", for: .normal)
+        button.setTitle(L10n.Tracker.Creation.cancel, for: .normal)
         button.setTitleColor(.systemRed, for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
         button.layer.borderWidth = 1
@@ -184,7 +188,7 @@ final class NewHabitViewController: UIViewController {
 
     private lazy var createButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("Создать", for: .normal)
+        button.setTitle(L10n.Tracker.Creation.create, for: .normal)
         button.setTitleColor(.white, for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
         button.layer.cornerRadius = 16
@@ -206,7 +210,7 @@ final class NewHabitViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
-        navigationItem.title = "Создание привычки"
+        navigationItem.title = L10n.Tracker.Creation.title
         navigationItem.largeTitleDisplayMode = .never
 
         configureActions()
@@ -349,16 +353,12 @@ final class NewHabitViewController: UIViewController {
     private func scheduleText() -> String? {
         guard !selectedSchedule.isEmpty else { return nil }
         if selectedSchedule.count == Weekday.allCases.count {
-            return "Каждый день"
+            return L10n.Tracker.Creation.everyDay
         }
 
-        let shortTitles: [Weekday: String] = [
-            .monday: "Пн", .tuesday: "Вт", .wednesday: "Ср", .thursday: "Чт",
-            .friday: "Пт", .saturday: "Сб", .sunday: "Вс"
-        ]
         return Weekday.allCases
             .filter { selectedSchedule.contains($0) }
-            .compactMap { shortTitles[$0] }
+            .map(\.shortTitle)
             .joined(separator: ", ")
     }
 
