@@ -37,8 +37,8 @@ final class StatisticsCardView: UIView {
 
         gradientLayer.frame = bounds
         borderMaskLayer.path = UIBezierPath(
-            roundedRect: bounds.insetBy(dx: 0.75, dy: 0.75),
-            cornerRadius: 16
+            roundedRect: bounds.insetBy(dx: 0.5, dy: 0.5),
+            cornerRadius: 15.5
         ).cgPath
     }
 
@@ -52,15 +52,15 @@ final class StatisticsCardView: UIView {
         translatesAutoresizingMaskIntoConstraints = false
 
         gradientLayer.colors = [
-            UIColor(red: 0.98, green: 0.27, blue: 0.27, alpha: 1).cgColor,
-            UIColor(red: 0.93, green: 0.78, blue: 0.25, alpha: 1).cgColor,
-            UIColor(red: 0.12, green: 0.56, blue: 0.96, alpha: 1).cgColor
+            UIColor(red: 253 / 255, green: 76 / 255, blue: 73 / 255, alpha: 1).cgColor,
+            UIColor(red: 70 / 255, green: 230 / 255, blue: 157 / 255, alpha: 1).cgColor,
+            UIColor(red: 0 / 255, green: 123 / 255, blue: 250 / 255, alpha: 1).cgColor
         ]
-        gradientLayer.startPoint = CGPoint(x: 0, y: 0)
-        gradientLayer.endPoint = CGPoint(x: 1, y: 1)
+        gradientLayer.startPoint = CGPoint(x: 0, y: 0.5)
+        gradientLayer.endPoint = CGPoint(x: 1, y: 0.5)
         borderMaskLayer.fillColor = UIColor.clear.cgColor
         borderMaskLayer.strokeColor = UIColor.black.cgColor
-        borderMaskLayer.lineWidth = 1.5
+        borderMaskLayer.lineWidth = 1
         gradientLayer.mask = borderMaskLayer
         layer.addSublayer(gradientLayer)
 

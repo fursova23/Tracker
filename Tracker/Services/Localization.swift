@@ -25,7 +25,7 @@ enum Localization {
 
         guard let path = Bundle.main.path(forResource: languageCode, ofType: "lproj"),
               let bundle = Bundle(path: path) else {
-            assertionFailure("Localization bundle not found: \(languageCode)")
+            assertionFailure("Bundle локализации не найден: \(languageCode)")
             return
         }
 
