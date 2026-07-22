@@ -7,3 +7,4 @@ strings:
       output: Tracker/Generated/Strings.swift
       params:
         enumName: L10n
+        lookupFunction: Localization.localizedString

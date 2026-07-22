@@ -12,8 +12,22 @@
 "trackers.add_accessibility" = "Добавить трекер";
 "trackers.empty_placeholder" = "Что будем отслеживать?";
 "trackers.search_empty_placeholder" = "Ничего не найдено";
+"trackers.context_menu.edit" = "Редактировать";
+"trackers.context_menu.delete" = "Удалить";
+"trackers.delete.message" = "Уверены, что хотите удалить трекер?";
+"trackers.delete.confirm" = "Удалить";
+"trackers.delete.cancel" = "Отменить";
+
+"filters.title" = "Фильтры";
+"filters.button" = "Фильтры";
+"filters.all" = "Все трекеры";
+"filters.today" = "Трекеры на сегодня";
+"filters.completed" = "Завершённые";
+"filters.incomplete" = "Незавершённые";
 
 "statistics.title" = "Статистика";
+"statistics.completed" = "Завершено";
+"statistics.empty_placeholder" = "Анализировать пока нечего";
 
 "schedule.title" = "Расписание";
 
@@ -27,6 +41,7 @@
 "category.new.placeholder" = "Введите название категории";
 
 "tracker.creation.title" = "Создание привычки";
+"tracker.creation.edit_title" = "Редактирование привычки";
 "tracker.creation.name_placeholder" = "Введите название трекера";
 "tracker.creation.name_limit" = "Ограничение 38 символов";
 "tracker.creation.category" = "Категория";
@@ -35,6 +50,7 @@
 "tracker.creation.color" = "Цвет";
 "tracker.creation.cancel" = "Отменить";
 "tracker.creation.create" = "Создать";
+"tracker.creation.save" = "Сохранить";
 "tracker.creation.every_day" = "Каждый день";
 
 "weekday.monday" = "Понедельник";

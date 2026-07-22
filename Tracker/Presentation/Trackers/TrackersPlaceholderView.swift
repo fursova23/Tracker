@@ -4,7 +4,7 @@ final class TrackersPlaceholderView: UIView {
 
     private let iconImageView: UIImageView = {
         let imageView = UIImageView()
-        imageView.image = UIImage(resource: .emptyTrackersIcon)
+        imageView.image = UIImage(resource: .emptySearchIcon)
         imageView.contentMode = .scaleAspectFit
         imageView.translatesAutoresizingMaskIntoConstraints = false
         return imageView
@@ -23,6 +23,11 @@ final class TrackersPlaceholderView: UIView {
         super.init(frame: frame)
         translatesAutoresizingMaskIntoConstraints = false
         configureLayout()
+    }
+
+    convenience init(image: UIImage) {
+        self.init(frame: .zero)
+        iconImageView.image = image
     }
 
     required init?(coder: NSCoder) {

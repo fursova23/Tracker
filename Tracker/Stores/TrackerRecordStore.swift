@@ -44,7 +44,7 @@ final class TrackerRecordStore: NSObject {
             throw StoreError.trackerNotFound
         }
 
-        let recordObject = TrackerRecordCoreData(context: context)
+        let recordObject = try context.makeObject(TrackerRecordCoreData.self)
         recordObject.date = Calendar.current.startOfDay(for: date)
         recordObject.tracker = trackerObject
 

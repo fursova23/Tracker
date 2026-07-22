@@ -6,6 +6,12 @@ protocol NewHabitViewControllerDelegate: AnyObject {
         didCreate tracker: Tracker,
         categoryTitle: String
     )
+
+    func newHabitViewController(
+        _ viewController: NewHabitViewController,
+        didUpdate tracker: Tracker,
+        categoryTitle: String
+    )
 }
 
 final class NewHabitViewController: UIViewController {
@@ -43,6 +49,7 @@ final class NewHabitViewController: UIViewController {
     weak var delegate: NewHabitViewControllerDelegate?
 
     private let trackerCategoryStore: TrackerCategoryStore
+    private let trackerToEdit: Tracker?
     private var selectedSchedule: Set<Weekday> = []
     private var selectedCategoryTitle: String?
     private var selectedEmoji: String?
@@ -189,7 +196,8 @@ final class NewHabitViewController: UIViewController {
     private lazy var createButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle(L10n.Tracker.Creation.create, for: .normal)
-        button.setTitleColor(.white, for: .normal)
+        button.setTitleColor(.systemBackground, for: .normal)
+        button.setTitleColor(.white, for: .disabled)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
         button.layer.cornerRadius = 16
         button.isEnabled = false
@@ -200,6 +208,21 @@ final class NewHabitViewController: UIViewController {
 
     init(trackerCategoryStore: TrackerCategoryStore) {
         self.trackerCategoryStore = trackerCategoryStore
+        trackerToEdit = nil
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    init(
+        trackerCategoryStore: TrackerCategoryStore,
+        tracker: Tracker,
+        categoryTitle: String
+    ) {
+        self.trackerCategoryStore = trackerCategoryStore
+        trackerToEdit = tracker
+        selectedSchedule = Set(tracker.schedule)
+        selectedCategoryTitle = categoryTitle
+        selectedEmoji = tracker.emoji
+        selectedColor = tracker.color
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -210,11 +233,14 @@ final class NewHabitViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
-        navigationItem.title = L10n.Tracker.Creation.title
+        navigationItem.title = trackerToEdit == nil
+            ? L10n.Tracker.Creation.title
+            : L10n.Tracker.Creation.editTitle
         navigationItem.largeTitleDisplayMode = .never
 
         configureActions()
         configureLayout()
+        configureEditingState()
         updateCreateButton()
     }
 
@@ -332,6 +358,31 @@ final class NewHabitViewController: UIViewController {
         createButton.backgroundColor = canCreate ? .label : .systemGray2
     }
 
+    private func configureEditingState() {
+        guard let trackerToEdit else { return }
+
+        nameTextField.text = trackerToEdit.name
+        categoryButton.setDetail(selectedCategoryTitle)
+        scheduleButton.setDetail(scheduleText())
+        createButton.setTitle(L10n.Tracker.Creation.save, for: .normal)
+
+        if let emojiIndex = Constants.emojis.firstIndex(of: trackerToEdit.emoji) {
+            emojiCollectionView.selectItem(
+                at: IndexPath(item: emojiIndex, section: 0),
+                animated: false,
+                scrollPosition: []
+            )
+        }
+
+        if let colorIndex = Constants.colors.firstIndex(where: { $0.isEqual(trackerToEdit.color) }) {
+            colorCollectionView.selectItem(
+                at: IndexPath(item: colorIndex, section: 0),
+                animated: false,
+                scrollPosition: []
+            )
+        }
+    }
+
     private func setNameLimitErrorVisible(_ isVisible: Bool) {
         guard nameLimitLabel.isHidden == isVisible else { return }
 
@@ -408,13 +459,18 @@ final class NewHabitViewController: UIViewController {
         }
 
         let tracker = Tracker(
-            id: UUID(),
+            id: trackerToEdit?.id ?? UUID(),
             name: name,
             color: selectedColor,
             emoji: selectedEmoji,
             schedule: Weekday.allCases.filter { selectedSchedule.contains($0) }
         )
-        delegate?.newHabitViewController(self, didCreate: tracker, categoryTitle: selectedCategoryTitle)
+
+        if trackerToEdit == nil {
+            delegate?.newHabitViewController(self, didCreate: tracker, categoryTitle: selectedCategoryTitle)
+        } else {
+            delegate?.newHabitViewController(self, didUpdate: tracker, categoryTitle: selectedCategoryTitle)
+        }
         dismiss(animated: true)
     }
 }

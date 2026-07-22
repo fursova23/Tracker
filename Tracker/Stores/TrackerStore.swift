@@ -3,6 +3,7 @@ import UIKit
 
 enum StoreError: Error {
     case trackerNotFound
+    case entityNotFound(String)
 }
 
 protocol TrackerStoreDelegate: AnyObject {
@@ -51,15 +52,27 @@ final class TrackerStore: NSObject {
 
     func add(_ tracker: Tracker, toCategoryWithTitle title: String) throws {
         let categoryObject = try fetchOrCreateCategory(withTitle: title)
-        let trackerObject = TrackerCoreData(context: context)
+        let trackerObject = try context.makeObject(TrackerCoreData.self)
 
-        trackerObject.id = tracker.id
-        trackerObject.name = tracker.name
-        trackerObject.colorHex = hexString(from: tracker.color)
-        trackerObject.emoji = tracker.emoji
-        trackerObject.schedule = scheduleString(from: tracker.schedule)
+        update(trackerObject, with: tracker)
         trackerObject.category = categoryObject
 
+        try context.save()
+    }
+
+    func update(_ tracker: Tracker, categoryTitle: String) throws {
+        let trackerObject = try fetchTrackerObject(withID: tracker.id)
+        let categoryObject = try fetchOrCreateCategory(withTitle: categoryTitle)
+
+        update(trackerObject, with: tracker)
+        trackerObject.category = categoryObject
+
+        try context.save()
+    }
+
+    func deleteTracker(withID id: UUID) throws {
+        let trackerObject = try fetchTrackerObject(withID: id)
+        context.delete(trackerObject)
         try context.save()
     }
 
@@ -72,9 +85,29 @@ final class TrackerStore: NSObject {
             return categoryObject
         }
 
-        let categoryObject = TrackerCategoryCoreData(context: context)
+        let categoryObject = try context.makeObject(TrackerCategoryCoreData.self)
         categoryObject.title = title
         return categoryObject
+    }
+
+    private func fetchTrackerObject(withID id: UUID) throws -> TrackerCoreData {
+        let request = TrackerCoreData.fetchRequest()
+        request.predicate = NSPredicate(format: "id == %@", id as CVarArg)
+        request.fetchLimit = 1
+
+        guard let trackerObject = try context.fetch(request).first else {
+            throw StoreError.trackerNotFound
+        }
+
+        return trackerObject
+    }
+
+    private func update(_ trackerObject: TrackerCoreData, with tracker: Tracker) {
+        trackerObject.id = tracker.id
+        trackerObject.name = tracker.name
+        trackerObject.colorHex = hexString(from: tracker.color)
+        trackerObject.emoji = tracker.emoji
+        trackerObject.schedule = scheduleString(from: tracker.schedule)
     }
 
     private func tracker(from trackerObject: TrackerCoreData) -> Tracker? {
@@ -139,6 +172,17 @@ final class TrackerStore: NSObject {
         let blue = CGFloat(value & 0xFF) / 255
 
         return UIColor(red: red, green: green, blue: blue, alpha: 1)
+    }
+}
+
+extension NSManagedObjectContext {
+
+    func makeObject<Object: NSManagedObject>(_ type: Object.Type) throws -> Object {
+        let entityName = String(describing: type)
+        guard let entity = NSEntityDescription.entity(forEntityName: entityName, in: self) else {
+            throw StoreError.entityNotFound(entityName)
+        }
+        return Object(entity: entity, insertInto: self)
     }
 }
 
