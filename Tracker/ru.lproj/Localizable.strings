@@ -1,0 +1,92 @@
+// MARK: - Onboarding
+
+"onboarding.first.title" = "Отслеживайте только то, что хотите";
+"onboarding.second.title" = "Даже если это не литры воды и йога";
+"onboarding.finish_button" = "Вот это технологии!";
+
+// MARK: - Common
+
+"common.done" = "Готово";
+
+// MARK: - Tab Bar
+
+"tab.trackers" = "Трекеры";
+"tab.statistics" = "Статистика";
+
+// MARK: - Trackers
+
+"trackers.title" = "Трекеры";
+"trackers.search_placeholder" = "Поиск";
+"trackers.add_accessibility" = "Добавить трекер";
+"trackers.empty_placeholder" = "Что будем отслеживать?";
+"trackers.search_empty_placeholder" = "Ничего не найдено";
+"trackers.context_menu.edit" = "Редактировать";
+"trackers.context_menu.delete" = "Удалить";
+"trackers.delete.message" = "Уверены, что хотите удалить трекер?";
+"trackers.delete.confirm" = "Удалить";
+"trackers.delete.cancel" = "Отменить";
+
+// MARK: - Filters
+
+"filters.title" = "Фильтры";
+"filters.button" = "Фильтры";
+"filters.all" = "Все трекеры";
+"filters.today" = "Трекеры на сегодня";
+"filters.completed" = "Завершённые";
+"filters.incomplete" = "Незавершённые";
+
+// MARK: - Statistics
+
+"statistics.title" = "Статистика";
+"statistics.completed" = "Завершено";
+"statistics.empty_placeholder" = "Анализировать пока нечего";
+
+// MARK: - Schedule
+
+"schedule.title" = "Расписание";
+
+// MARK: - Category
+
+"category.title" = "Категория";
+"category.empty_placeholder" = "Привычки и события можно\nобъединить по смыслу";
+"category.add_button" = "Добавить категорию";
+"category.alert.ok" = "ОК";
+"category.error.load" = "Не удалось загрузить категории";
+"category.error.save" = "Не удалось сохранить категорию";
+"category.new.title" = "Новая категория";
+"category.new.placeholder" = "Введите название категории";
+
+// MARK: - Tracker Creation
+
+"tracker.creation.title" = "Создание привычки";
+"tracker.creation.edit_title" = "Редактирование привычки";
+"tracker.creation.name_placeholder" = "Введите название трекера";
+"tracker.creation.name_limit" = "Ограничение 38 символов";
+"tracker.creation.category" = "Категория";
+"tracker.creation.schedule" = "Расписание";
+"tracker.creation.emoji" = "Emoji";
+"tracker.creation.color" = "Цвет";
+"tracker.creation.cancel" = "Отменить";
+"tracker.creation.create" = "Создать";
+"tracker.creation.save" = "Сохранить";
+"tracker.creation.every_day" = "Каждый день";
+
+// MARK: - Weekdays
+
+"weekday.monday" = "Понедельник";
+"weekday.tuesday" = "Вторник";
+"weekday.wednesday" = "Среда";
+"weekday.thursday" = "Четверг";
+"weekday.friday" = "Пятница";
+"weekday.saturday" = "Суббота";
+"weekday.sunday" = "Воскресенье";
+
+// MARK: - Short Weekdays
+
+"weekday.short.monday" = "Пн";
+"weekday.short.tuesday" = "Вт";
+"weekday.short.wednesday" = "Ср";
+"weekday.short.thursday" = "Чт";
+"weekday.short.friday" = "Пт";
+"weekday.short.saturday" = "Сб";
+"weekday.short.sunday" = "Вс";

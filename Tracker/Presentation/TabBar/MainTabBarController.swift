@@ -6,6 +6,10 @@ final class MainTabBarController: UITabBarController {
 
     private let trackerCategoryStore: TrackerCategoryStore
     private let trackerRecordStore: TrackerRecordStore
+    private let statisticsTrackerRecordStore: TrackerRecordStore
+    private let analyticsService: AnalyticsServiceProtocol
+    private let currentDate: Date
+    private let datePickerLocale: Locale?
 
     // MARK: - UI Elements
 
@@ -19,13 +23,22 @@ final class MainTabBarController: UITabBarController {
 
     // MARK: - Lifecycle
 
-    init(coreDataStack: CoreDataStack) {
+    init(
+        coreDataStack: CoreDataStack,
+        analyticsService: AnalyticsServiceProtocol = AnalyticsService.shared,
+        currentDate: Date = Date(),
+        datePickerLocale: Locale? = nil
+    ) {
         let trackerStore = TrackerStore(coreDataStack: coreDataStack)
         trackerCategoryStore = TrackerCategoryStore(
             coreDataStack: coreDataStack,
             trackerStore: trackerStore
         )
         trackerRecordStore = TrackerRecordStore(coreDataStack: coreDataStack)
+        statisticsTrackerRecordStore = TrackerRecordStore(coreDataStack: coreDataStack)
+        self.analyticsService = analyticsService
+        self.currentDate = currentDate
+        self.datePickerLocale = datePickerLocale
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -51,15 +64,20 @@ final class MainTabBarController: UITabBarController {
         let trackersController = makeNavigationController(
             rootViewController: TrackersViewController(
                 trackerCategoryStore: trackerCategoryStore,
-                trackerRecordStore: trackerRecordStore
+                trackerRecordStore: trackerRecordStore,
+                analyticsService: analyticsService,
+                currentDate: currentDate,
+                datePickerLocale: datePickerLocale
             ),
-            title: "Трекеры",
+            title: L10n.Tab.trackers,
             image: UIImage(resource: .trackersTabIcon),
             tag: 0
         )
         let statisticsController = makeNavigationController(
-            rootViewController: StatisticsViewController(),
-            title: "Статистика",
+            rootViewController: StatisticsViewController(
+                trackerRecordStore: statisticsTrackerRecordStore
+            ),
+            title: L10n.Tab.statistics,
             image: UIImage(resource: .statisticsTabIcon),
             tag: 1
         )

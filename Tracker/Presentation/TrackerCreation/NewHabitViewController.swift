@@ -6,13 +6,19 @@ protocol NewHabitViewControllerDelegate: AnyObject {
         didCreate tracker: Tracker,
         categoryTitle: String
     )
+
+    func newHabitViewController(
+        _ viewController: NewHabitViewController,
+        didUpdate tracker: Tracker,
+        categoryTitle: String
+    )
 }
 
 final class NewHabitViewController: UIViewController {
 
     private enum Constants {
         static let maxNameLength = 38
-        static let nameLimitMessage = "Ограничение 38 символов"
+        static let nameLimitMessage = L10n.Tracker.Creation.nameLimit
         static let emojis = [
             "🙂", "😻", "🌺", "🐶", "❤️", "😱",
             "😇", "😡", "🥶", "🤔", "🙌", "🍔",
@@ -43,6 +49,7 @@ final class NewHabitViewController: UIViewController {
     weak var delegate: NewHabitViewControllerDelegate?
 
     private let trackerCategoryStore: TrackerCategoryStore
+    private let trackerToEdit: Tracker?
     private var selectedSchedule: Set<Weekday> = []
     private var selectedCategoryTitle: String?
     private var selectedEmoji: String?
@@ -64,7 +71,7 @@ final class NewHabitViewController: UIViewController {
 
     private let nameTextField: UITextField = {
         let textField = UITextField()
-        textField.placeholder = "Введите название трекера"
+        textField.placeholder = L10n.Tracker.Creation.namePlaceholder
         textField.font = .systemFont(ofSize: 17)
         textField.backgroundColor = .secondarySystemBackground
         textField.layer.cornerRadius = 16
@@ -95,8 +102,12 @@ final class NewHabitViewController: UIViewController {
         return view
     }()
 
-    private let categoryButton = TrackerOptionButton(title: "Категория")
-    private let scheduleButton = TrackerOptionButton(title: "Расписание")
+    private let categoryButton = TrackerOptionButton(
+        title: L10n.Tracker.Creation.category
+    )
+    private let scheduleButton = TrackerOptionButton(
+        title: L10n.Tracker.Creation.schedule
+    )
 
     private let separatorView: UIView = {
         let view = UIView()
@@ -107,7 +118,7 @@ final class NewHabitViewController: UIViewController {
 
     private let emojiTitleLabel: UILabel = {
         let label = UILabel()
-        label.text = "Emoji"
+        label.text = L10n.Tracker.Creation.emoji
         label.font = .systemFont(ofSize: 19, weight: .bold)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -134,7 +145,7 @@ final class NewHabitViewController: UIViewController {
 
     private let colorTitleLabel: UILabel = {
         let label = UILabel()
-        label.text = "Цвет"
+        label.text = L10n.Tracker.Creation.color
         label.font = .systemFont(ofSize: 19, weight: .bold)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -171,7 +182,7 @@ final class NewHabitViewController: UIViewController {
 
     private lazy var cancelButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("Отменить", for: .normal)
+        button.setTitle(L10n.Tracker.Creation.cancel, for: .normal)
         button.setTitleColor(.systemRed, for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
         button.layer.borderWidth = 1
@@ -184,8 +195,9 @@ final class NewHabitViewController: UIViewController {
 
     private lazy var createButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("Создать", for: .normal)
-        button.setTitleColor(.white, for: .normal)
+        button.setTitle(L10n.Tracker.Creation.create, for: .normal)
+        button.setTitleColor(.systemBackground, for: .normal)
+        button.setTitleColor(.white, for: .disabled)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
         button.layer.cornerRadius = 16
         button.isEnabled = false
@@ -196,6 +208,21 @@ final class NewHabitViewController: UIViewController {
 
     init(trackerCategoryStore: TrackerCategoryStore) {
         self.trackerCategoryStore = trackerCategoryStore
+        trackerToEdit = nil
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    init(
+        trackerCategoryStore: TrackerCategoryStore,
+        tracker: Tracker,
+        categoryTitle: String
+    ) {
+        self.trackerCategoryStore = trackerCategoryStore
+        trackerToEdit = tracker
+        selectedSchedule = Set(tracker.schedule)
+        selectedCategoryTitle = categoryTitle
+        selectedEmoji = tracker.emoji
+        selectedColor = tracker.color
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -206,11 +233,14 @@ final class NewHabitViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
-        navigationItem.title = "Создание привычки"
+        navigationItem.title = trackerToEdit == nil
+            ? L10n.Tracker.Creation.title
+            : L10n.Tracker.Creation.editTitle
         navigationItem.largeTitleDisplayMode = .never
 
         configureActions()
         configureLayout()
+        configureEditingState()
         updateCreateButton()
     }
 
@@ -328,6 +358,31 @@ final class NewHabitViewController: UIViewController {
         createButton.backgroundColor = canCreate ? .label : .systemGray2
     }
 
+    private func configureEditingState() {
+        guard let trackerToEdit else { return }
+
+        nameTextField.text = trackerToEdit.name
+        categoryButton.setDetail(selectedCategoryTitle)
+        scheduleButton.setDetail(scheduleText())
+        createButton.setTitle(L10n.Tracker.Creation.save, for: .normal)
+
+        if let emojiIndex = Constants.emojis.firstIndex(of: trackerToEdit.emoji) {
+            emojiCollectionView.selectItem(
+                at: IndexPath(item: emojiIndex, section: 0),
+                animated: false,
+                scrollPosition: []
+            )
+        }
+
+        if let colorIndex = Constants.colors.firstIndex(where: { $0.isEqual(trackerToEdit.color) }) {
+            colorCollectionView.selectItem(
+                at: IndexPath(item: colorIndex, section: 0),
+                animated: false,
+                scrollPosition: []
+            )
+        }
+    }
+
     private func setNameLimitErrorVisible(_ isVisible: Bool) {
         guard nameLimitLabel.isHidden == isVisible else { return }
 
@@ -349,16 +404,12 @@ final class NewHabitViewController: UIViewController {
     private func scheduleText() -> String? {
         guard !selectedSchedule.isEmpty else { return nil }
         if selectedSchedule.count == Weekday.allCases.count {
-            return "Каждый день"
+            return L10n.Tracker.Creation.everyDay
         }
 
-        let shortTitles: [Weekday: String] = [
-            .monday: "Пн", .tuesday: "Вт", .wednesday: "Ср", .thursday: "Чт",
-            .friday: "Пт", .saturday: "Сб", .sunday: "Вс"
-        ]
         return Weekday.allCases
             .filter { selectedSchedule.contains($0) }
-            .compactMap { shortTitles[$0] }
+            .map(\.shortTitle)
             .joined(separator: ", ")
     }
 
@@ -408,13 +459,18 @@ final class NewHabitViewController: UIViewController {
         }
 
         let tracker = Tracker(
-            id: UUID(),
+            id: trackerToEdit?.id ?? UUID(),
             name: name,
             color: selectedColor,
             emoji: selectedEmoji,
             schedule: Weekday.allCases.filter { selectedSchedule.contains($0) }
         )
-        delegate?.newHabitViewController(self, didCreate: tracker, categoryTitle: selectedCategoryTitle)
+
+        if trackerToEdit == nil {
+            delegate?.newHabitViewController(self, didCreate: tracker, categoryTitle: selectedCategoryTitle)
+        } else {
+            delegate?.newHabitViewController(self, didUpdate: tracker, categoryTitle: selectedCategoryTitle)
+        }
         dismiss(animated: true)
     }
 }

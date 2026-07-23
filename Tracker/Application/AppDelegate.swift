@@ -8,7 +8,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     // MARK: - Lifecycle
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        // Override point for customization after application launch.
+        let apiKey = Bundle.main.object(forInfoDictionaryKey: "AppMetricaAPIKey") as? String ?? ""
+        AnalyticsService.shared.activate(apiKey: apiKey)
         return true
     }
 

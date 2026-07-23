@@ -25,7 +25,7 @@ final class ScheduleViewController: UIViewController {
 
     private lazy var doneButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("Готово", for: .normal)
+        button.setTitle(L10n.Common.done, for: .normal)
         button.setTitleColor(.systemBackground, for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
         button.backgroundColor = .label
@@ -47,7 +47,7 @@ final class ScheduleViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
-        navigationItem.title = "Расписание"
+        navigationItem.title = L10n.Schedule.title
         navigationItem.largeTitleDisplayMode = .never
         navigationItem.hidesBackButton = true
 

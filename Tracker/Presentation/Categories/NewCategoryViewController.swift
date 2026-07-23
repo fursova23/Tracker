@@ -10,7 +10,7 @@ final class NewCategoryViewController: UIViewController {
 
     private let titleTextField: UITextField = {
         let textField = UITextField()
-        textField.placeholder = "Введите название категории"
+        textField.placeholder = L10n.Category.New.placeholder
         textField.font = .systemFont(ofSize: 17)
         textField.backgroundColor = .secondarySystemBackground
         textField.layer.cornerRadius = 16
@@ -24,7 +24,7 @@ final class NewCategoryViewController: UIViewController {
 
     private lazy var doneButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("Готово", for: .normal)
+        button.setTitle(L10n.Common.done, for: .normal)
         button.setTitleColor(.systemBackground, for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
         button.backgroundColor = .systemGray2
@@ -41,8 +41,9 @@ final class NewCategoryViewController: UIViewController {
         super.viewDidLoad()
 
         view.backgroundColor = .systemBackground
-        navigationItem.title = "Новая категория"
+        navigationItem.title = L10n.Category.New.title
         navigationItem.largeTitleDisplayMode = .never
+        navigationItem.hidesBackButton = true
 
         titleTextField.delegate = self
         titleTextField.addTarget(self, action: #selector(titleTextChanged), for: .editingChanged)

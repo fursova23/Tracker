@@ -1,0 +1,92 @@
+// MARK: - Onboarding
+
+"onboarding.first.title" = "Track only what you want";
+"onboarding.second.title" = "Even if it is not water or yoga";
+"onboarding.finish_button" = "That's technology!";
+
+// MARK: - Common
+
+"common.done" = "Done";
+
+// MARK: - Tab Bar
+
+"tab.trackers" = "Trackers";
+"tab.statistics" = "Statistics";
+
+// MARK: - Trackers
+
+"trackers.title" = "Trackers";
+"trackers.search_placeholder" = "Search";
+"trackers.add_accessibility" = "Add tracker";
+"trackers.empty_placeholder" = "What should we track?";
+"trackers.search_empty_placeholder" = "Nothing found";
+"trackers.context_menu.edit" = "Edit";
+"trackers.context_menu.delete" = "Delete";
+"trackers.delete.message" = "Are you sure you want to delete this tracker?";
+"trackers.delete.confirm" = "Delete";
+"trackers.delete.cancel" = "Cancel";
+
+// MARK: - Filters
+
+"filters.title" = "Filters";
+"filters.button" = "Filters";
+"filters.all" = "All trackers";
+"filters.today" = "Trackers for today";
+"filters.completed" = "Completed";
+"filters.incomplete" = "Incomplete";
+
+// MARK: - Statistics
+
+"statistics.title" = "Statistics";
+"statistics.completed" = "Completed";
+"statistics.empty_placeholder" = "Nothing to analyze yet";
+
+// MARK: - Schedule
+
+"schedule.title" = "Schedule";
+
+// MARK: - Category
+
+"category.title" = "Category";
+"category.empty_placeholder" = "Habits and events can be\ngrouped by meaning";
+"category.add_button" = "Add category";
+"category.alert.ok" = "OK";
+"category.error.load" = "Failed to load categories";
+"category.error.save" = "Failed to save category";
+"category.new.title" = "New category";
+"category.new.placeholder" = "Enter category name";
+
+// MARK: - Tracker Creation
+
+"tracker.creation.title" = "New habit";
+"tracker.creation.edit_title" = "Edit habit";
+"tracker.creation.name_placeholder" = "Enter tracker name";
+"tracker.creation.name_limit" = "38-character limit";
+"tracker.creation.category" = "Category";
+"tracker.creation.schedule" = "Schedule";
+"tracker.creation.emoji" = "Emoji";
+"tracker.creation.color" = "Color";
+"tracker.creation.cancel" = "Cancel";
+"tracker.creation.create" = "Create";
+"tracker.creation.save" = "Save";
+"tracker.creation.every_day" = "Every day";
+
+// MARK: - Weekdays
+
+"weekday.monday" = "Monday";
+"weekday.tuesday" = "Tuesday";
+"weekday.wednesday" = "Wednesday";
+"weekday.thursday" = "Thursday";
+"weekday.friday" = "Friday";
+"weekday.saturday" = "Saturday";
+"weekday.sunday" = "Sunday";
+
+// MARK: - Short Weekdays
+
+"weekday.short.monday" = "Mon";
+"weekday.short.tuesday" = "Tue";
+"weekday.short.wednesday" = "Wed";
+"weekday.short.thursday" = "Thu";
+"weekday.short.friday" = "Fri";
+"weekday.short.saturday" = "Sat";
+"weekday.short.sunday" = "Sun";

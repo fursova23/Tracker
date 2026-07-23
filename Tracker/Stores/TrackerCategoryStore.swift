@@ -44,6 +44,14 @@ final class TrackerCategoryStore: NSObject {
         try trackerStore.add(tracker, toCategoryWithTitle: title)
     }
 
+    func update(_ tracker: Tracker, categoryTitle: String) throws {
+        try trackerStore.update(tracker, categoryTitle: categoryTitle)
+    }
+
+    func deleteTracker(withID id: UUID) throws {
+        try trackerStore.deleteTracker(withID: id)
+    }
+
     func createCategoryIfNeeded(withTitle title: String) throws {
         let request = TrackerCategoryCoreData.fetchRequest()
         request.predicate = NSPredicate(format: "title == %@", title)
@@ -51,7 +59,7 @@ final class TrackerCategoryStore: NSObject {
 
         guard try context.fetch(request).first == nil else { return }
 
-        let categoryObject = TrackerCategoryCoreData(context: context)
+        let categoryObject = try context.makeObject(TrackerCategoryCoreData.self)
         categoryObject.title = title
 
         try context.save()

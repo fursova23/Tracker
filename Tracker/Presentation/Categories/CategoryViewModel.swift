@@ -39,7 +39,7 @@ final class CategoryViewModel {
         do {
             categories = try categoryStore.fetchCategories()
         } catch {
-            onError?("Не удалось загрузить категории")
+            onError?(L10n.Category.Error.load)
         }
     }
 
@@ -51,7 +51,7 @@ final class CategoryViewModel {
             try categoryStore.createCategoryIfNeeded(withTitle: trimmedTitle)
             loadCategories()
         } catch {
-            onError?("Не удалось сохранить категорию")
+            onError?(L10n.Category.Error.save)
         }
     }
 

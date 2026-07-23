@@ -8,8 +8,11 @@ final class CoreDataStack {
 
     let persistentContainer: NSPersistentContainer
 
-    init() {
+    init(inMemory: Bool = false) {
         let container = NSPersistentContainer(name: Constants.modelName)
+        if inMemory {
+            container.persistentStoreDescriptions.first?.type = NSInMemoryStoreType
+        }
         container.loadPersistentStores { _, error in
             if let error = error as NSError? {
                 fatalError("Unresolved Core Data error \(error), \(error.userInfo)")

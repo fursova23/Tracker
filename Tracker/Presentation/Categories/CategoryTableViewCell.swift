@@ -26,6 +26,13 @@ final class CategoryTableViewCell: UITableViewCell {
         return imageView
     }()
 
+    private let separatorView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .separator
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+
     // MARK: - Lifecycle
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
@@ -35,6 +42,7 @@ final class CategoryTableViewCell: UITableViewCell {
         selectionStyle = .none
         contentView.addSubview(titleLabel)
         contentView.addSubview(checkmarkImageView)
+        contentView.addSubview(separatorView)
 
         NSLayoutConstraint.activate([
             titleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
@@ -44,7 +52,12 @@ final class CategoryTableViewCell: UITableViewCell {
             checkmarkImageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             checkmarkImageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
             checkmarkImageView.widthAnchor.constraint(equalToConstant: 24),
-            checkmarkImageView.heightAnchor.constraint(equalToConstant: 24)
+            checkmarkImageView.heightAnchor.constraint(equalToConstant: 24),
+
+            separatorView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            separatorView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
+            separatorView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
+            separatorView.heightAnchor.constraint(equalToConstant: 0.5)
         ])
     }
 
@@ -55,8 +68,9 @@ final class CategoryTableViewCell: UITableViewCell {
 
     // MARK: - Configuration
 
-    func configure(title: String, isSelected: Bool) {
+    func configure(title: String, isSelected: Bool, showsSeparator: Bool) {
         titleLabel.text = title
         checkmarkImageView.isHidden = !isSelected
+        separatorView.isHidden = !showsSeparator
     }
 }

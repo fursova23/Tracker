@@ -9,12 +9,12 @@ final class OnboardingViewController: UIViewController {
     private let pages: [OnboardingPageViewController] = [
         OnboardingPageViewController(
             pageIndex: 0,
-            titleText: "Отслеживайте только то, что хотите",
+            titleText: L10n.Onboarding.First.title,
             backgroundImageResource: .onboardingBlue
         ),
         OnboardingPageViewController(
             pageIndex: 1,
-            titleText: "Даже если это не литры воды и йога",
+            titleText: L10n.Onboarding.Second.title,
             backgroundImageResource: .onboardingRed
         )
     ]
@@ -42,7 +42,7 @@ final class OnboardingViewController: UIViewController {
     private lazy var finishButton: UIButton = {
         let button = UIButton(type: .system)
         button.backgroundColor = .black
-        button.setTitle("Вот это технологии!", for: .normal)
+        button.setTitle(L10n.Onboarding.finishButton, for: .normal)
         button.setTitleColor(.white, for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
         button.layer.cornerRadius = 16

@@ -6,6 +6,11 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		AA0000010000000000000001 /* AppMetricaCore in Frameworks */ = {isa = PBXBuildFile; productRef = AA0000030000000000000003 /* AppMetricaCore */; };
+		AA0000020000000000000002 /* SnapshotTesting in Frameworks */ = {isa = PBXBuildFile; productRef = AA0000040000000000000004 /* SnapshotTesting */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		EF4C78322FE49C7400BBDBAA /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -65,6 +70,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AA0000010000000000000001 /* AppMetricaCore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -72,6 +78,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AA0000020000000000000002 /* SnapshotTesting in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -125,6 +132,7 @@
 			);
 			name = Tracker;
 			packageProductDependencies = (
+				AA0000030000000000000003 /* AppMetricaCore */,
 			);
 			productName = Tracker;
 			productReference = EF4C781B2FE49C7300BBDBAA /* Tracker.app */;
@@ -148,6 +156,7 @@
 			);
 			name = TrackerTests;
 			packageProductDependencies = (
+				AA0000040000000000000004 /* SnapshotTesting */,
 			);
 			productName = TrackerTests;
 			productReference = EF4C78312FE49C7400BBDBAA /* TrackerTests.xctest */;
@@ -205,9 +214,14 @@
 			knownRegions = (
 				en,
 				Base,
+				ru,
 			);
 			mainGroup = EF4C78122FE49C7300BBDBAA;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				AA0000050000000000000005 /* XCRemoteSwiftPackageReference "appmetrica-sdk-ios" */,
+				AA0000060000000000000006 /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = EF4C781C2FE49C7300BBDBAA /* Products */;
 			projectDirPath = "";
@@ -285,6 +299,7 @@
 		EF4C78452FE49C7400BBDBAA /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				APPMETRICA_API_KEY = "3eae2d03-6c77-494d-8c96-484cff48a238";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
@@ -320,6 +335,7 @@
 		EF4C78462FE49C7400BBDBAA /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				APPMETRICA_API_KEY = "3eae2d03-6c77-494d-8c96-484cff48a238";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
@@ -593,6 +609,38 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		AA0000050000000000000005 /* XCRemoteSwiftPackageReference "appmetrica-sdk-ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/appmetrica/appmetrica-sdk-ios";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 6.4.0;
+			};
+		};
+		AA0000060000000000000006 /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/pointfreeco/swift-snapshot-testing";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.19.2;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		AA0000030000000000000003 /* AppMetricaCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = AA0000050000000000000005 /* XCRemoteSwiftPackageReference "appmetrica-sdk-ios" */;
+			productName = AppMetricaCore;
+		};
+		AA0000040000000000000004 /* SnapshotTesting */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = AA0000060000000000000006 /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */;
+			productName = SnapshotTesting;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = EF4C78132FE49C7300BBDBAA /* Project object */;
 }
