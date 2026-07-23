@@ -19,6 +19,12 @@ protocol AnalyticsServiceProtocol {
     func report(event: AnalyticsEvent, item: AnalyticsItem?)
 }
 
+extension AnalyticsServiceProtocol {
+    func report(event: AnalyticsEvent) {
+        report(event: event, item: nil)
+    }
+}
+
 final class AnalyticsService: AnalyticsServiceProtocol {
 
     static let shared = AnalyticsService()

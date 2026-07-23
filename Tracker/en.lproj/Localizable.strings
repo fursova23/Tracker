@@ -1,11 +1,19 @@
+// MARK: - Onboarding
+
 "onboarding.first.title" = "Track only what you want";
 "onboarding.second.title" = "Even if it is not water or yoga";
 "onboarding.finish_button" = "That's technology!";
 
+// MARK: - Common
+
 "common.done" = "Done";
+
+// MARK: - Tab Bar
 
 "tab.trackers" = "Trackers";
 "tab.statistics" = "Statistics";
+
+// MARK: - Trackers
 
 "trackers.title" = "Trackers";
 "trackers.search_placeholder" = "Search";
@@ -18,6 +26,8 @@
 "trackers.delete.confirm" = "Delete";
 "trackers.delete.cancel" = "Cancel";
 
+// MARK: - Filters
+
 "filters.title" = "Filters";
 "filters.button" = "Filters";
 "filters.all" = "All trackers";
@@ -25,11 +35,17 @@
 "filters.completed" = "Completed";
 "filters.incomplete" = "Incomplete";
 
+// MARK: - Statistics
+
 "statistics.title" = "Statistics";
 "statistics.completed" = "Completed";
 "statistics.empty_placeholder" = "Nothing to analyze yet";
 
+// MARK: - Schedule
+
 "schedule.title" = "Schedule";
+
+// MARK: - Category
 
 "category.title" = "Category";
 "category.empty_placeholder" = "Habits and events can be\ngrouped by meaning";
@@ -39,6 +55,8 @@
 "category.error.save" = "Failed to save category";
 "category.new.title" = "New category";
 "category.new.placeholder" = "Enter category name";
+
+// MARK: - Tracker Creation
 
 "tracker.creation.title" = "New habit";
 "tracker.creation.edit_title" = "Edit habit";
@@ -53,6 +71,8 @@
 "tracker.creation.save" = "Save";
 "tracker.creation.every_day" = "Every day";
 
+// MARK: - Weekdays
+
 "weekday.monday" = "Monday";
 "weekday.tuesday" = "Tuesday";
 "weekday.wednesday" = "Wednesday";
@@ -60,6 +80,8 @@
 "weekday.friday" = "Friday";
 "weekday.saturday" = "Saturday";
 "weekday.sunday" = "Sunday";
+
+// MARK: - Short Weekdays
 
 "weekday.short.monday" = "Mon";
 "weekday.short.tuesday" = "Tue";

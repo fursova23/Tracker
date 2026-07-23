@@ -108,12 +108,12 @@ final class TrackersViewController: UIViewController {
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        analyticsService.report(event: .open, item: nil)
+        analyticsService.report(event: .open)
     }
 
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
-        analyticsService.report(event: .close, item: nil)
+        analyticsService.report(event: .close)
     }
 
     private func configureNavigationBar() {

@@ -43,6 +43,7 @@ final class NewCategoryViewController: UIViewController {
         view.backgroundColor = .systemBackground
         navigationItem.title = L10n.Category.New.title
         navigationItem.largeTitleDisplayMode = .never
+        navigationItem.hidesBackButton = true
 
         titleTextField.delegate = self
         titleTextField.addTarget(self, action: #selector(titleTextChanged), for: .editingChanged)

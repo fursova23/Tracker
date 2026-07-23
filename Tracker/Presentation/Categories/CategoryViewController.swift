@@ -12,15 +12,20 @@ final class CategoryViewController: UIViewController {
 
     private let tableView: UITableView = {
         let tableView = UITableView(frame: .zero, style: .plain)
-        tableView.backgroundColor = .secondarySystemBackground
+        tableView.backgroundColor = .clear
         tableView.layer.cornerRadius = 16
         tableView.layer.masksToBounds = true
         tableView.rowHeight = 75
-        tableView.separatorInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
-        tableView.tableFooterView = UIView()
+        tableView.separatorStyle = .none
         tableView.register(CategoryTableViewCell.self, forCellReuseIdentifier: CategoryTableViewCell.reuseIdentifier)
         tableView.translatesAutoresizingMaskIntoConstraints = false
         return tableView
+    }()
+
+    private lazy var tableViewHeightConstraint: NSLayoutConstraint = {
+        let constraint = tableView.heightAnchor.constraint(equalToConstant: 0)
+        constraint.priority = .defaultHigh
+        return constraint
     }()
 
     private let placeholderImageView: UIImageView = {
@@ -80,6 +85,7 @@ final class CategoryViewController: UIViewController {
         view.backgroundColor = .systemBackground
         navigationItem.title = L10n.Category.title
         navigationItem.largeTitleDisplayMode = .never
+        navigationItem.hidesBackButton = true
 
         setupBindings()
         setupTableView()
@@ -91,8 +97,10 @@ final class CategoryViewController: UIViewController {
 
     private func setupBindings() {
         viewModel.onCategoriesChanged = { [weak self] in
-            self?.tableView.reloadData()
-            self?.updatePlaceholder()
+            guard let self else { return }
+            tableView.reloadData()
+            tableViewHeightConstraint.constant = CGFloat(viewModel.categoriesAmount) * tableView.rowHeight
+            updatePlaceholder()
         }
 
         viewModel.onSelectedCategoryChanged = { [weak self] title in
@@ -120,7 +128,8 @@ final class CategoryViewController: UIViewController {
             tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 24),
             tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-            tableView.bottomAnchor.constraint(equalTo: addCategoryButton.topAnchor, constant: -16),
+            tableView.bottomAnchor.constraint(lessThanOrEqualTo: addCategoryButton.topAnchor, constant: -16),
+            tableViewHeightConstraint,
 
             placeholderImageView.widthAnchor.constraint(equalToConstant: 80),
             placeholderImageView.heightAnchor.constraint(equalToConstant: 80),
@@ -180,7 +189,8 @@ extension CategoryViewController: UITableViewDataSource {
 
         cell.configure(
             title: viewModel.categoryTitle(at: indexPath.row),
-            isSelected: viewModel.isCategorySelected(at: indexPath.row)
+            isSelected: viewModel.isCategorySelected(at: indexPath.row),
+            showsSeparator: indexPath.row < viewModel.categoriesAmount - 1
         )
         return cell
     }
